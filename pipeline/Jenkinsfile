@@ -34,11 +34,11 @@ pipeline{
                 }
             }
         }
-	stage('Install Dependencies') {
-            steps {
-                sh 'npm install' // Replace with your package manager command
-            }
-	}
+	// stage('Install Dependencies') {
+ //            steps {
+ //                sh 'npm install' // Replace with your package manager command
+ //            }
+	// }
             
         stage('Build Image'){
             when {
@@ -70,7 +70,7 @@ pipeline{
 	stage('Run Unit Tests') {
             steps {
                 script {
-                    sh 'npm test' // Replace with your test runner command
+                    sh 'node_modules/text-hex/test.js mocha --recursive node_modules/text-hex/test.js  --reporter mocha-junit-reporter --timeout 60000 --exit' // Replace with your test runner command
                 }
             }
 	}
