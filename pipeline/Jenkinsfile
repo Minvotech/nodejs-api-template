@@ -2,21 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Define environment variables for GitHub Container Registry
-        GHCR_USERNAME = credentials('b6ae1537-20e2-46fd-957f-52b949237f83	') // Jenkins credentials ID for GHCR username
-        GHCR_TOKEN = credentials('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') // Jenkins credentials ID for GHCR token
-        IMAGE_NAME = 'ghcr.io/${{ github.repository }}/production:${{ github.sha }}'
-        IMAGE_TAG = "${env.BUILD_ID}" // Tag the image with the Jenkins build ID or use a version tag
-        REGISTRY_URL = 'ghcr.io'
-        REPO_NAME = 'eslamshehata2/nodejs-api-template' // Replace with your GitHub username and repo name
-    }
-	=======
-	
-	
-	pipeline {
-    agent any
-
-    environment {
         GHCR_USERNAME = credentials('b6ae1537-20e2-46fd-957f-52b949237f83	') // Jenkins credentials ID for GHCR username
         GHCR_TOKEN = credentials('b6ae1537-20e2-46fd-957f-52b949237f83	') // Jenkins credentials ID for GHCR token
         IMAGE_NAME = 'nodejs-api-template'
