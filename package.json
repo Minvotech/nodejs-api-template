@@ -4,7 +4,7 @@
   "description": "Node API Template to quickly make API's with NodeJS",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive test",
+    "test": "mocha",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
