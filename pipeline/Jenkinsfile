@@ -1,5 +1,8 @@
 pipeline{
-    agent any	
+    agent any
+    tools {
+        nodejs "nodejs" // Name of the installed Node.js version
+    }
 //    agent {
  //        'any' //'docker-builder'
   //  }
