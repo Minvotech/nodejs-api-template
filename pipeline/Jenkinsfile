@@ -35,7 +35,7 @@ pipeline{
                 withCredentials([usernamePassword(credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
                     // Checkout Dockerfile from different repository and branch
                     git credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', 
-                        url: 'https://github.com/Minvotech/nodejs-api-template.git'',
+                        url: 'https://github.com/Minvotech/nodejs-api-template.git',
                         branch: 'main' 
                     sh "ls -ltrh"
                     sh 'pwd'
