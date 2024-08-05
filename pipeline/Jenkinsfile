@@ -59,18 +59,14 @@ pipeline{
         }
 
 	stage('Run Unit Tests') {
-            when {
-                expression { dockerOnly == 'yes' }
-            }
             steps {
                 script {
-                    // Run tests inside the Docker container
-                    sh """
-                        docker run --rm ${env.dockerImageName}:${env.dockerImageTag} npm test
-                    """
+                    echo "Running unit tests..."
+                    sh 'npm install'
+                    sh 'npm run test'
                 }
             }
-        }    
+        }   
         
         
         stage ('GHCR Upload'){
