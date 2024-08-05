@@ -6,7 +6,8 @@ pipeline{
     
     environment{
         dockerImageName = "nodejs-api-template"
-        dockerImageTag = "1.21"
+        //dockerImageTag = "1.21"
+	dockerImageTag = "${env.BUILD_NUMBER}"  //"${currentBuild.number}"
         dockerOnly = 'yes'	
 	repo = 'ghcr.io/minvotech/nodejs'
 	GHCR_USERNAME = credentials('b6ae1537-20e2-46fd-957f-52b949237f83') // Jenkins credentials ID for GHCR username
