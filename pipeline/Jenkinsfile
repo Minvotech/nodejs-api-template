@@ -41,7 +41,7 @@ pipeline{
                         branch: 'main' 
                     sh "ls -ltrh"
                     sh 'pwd'
-                    sh " DOCKER_BUILDKIT=0 docker build -t ${env.dockerImageName}:${env.dockerImageTag} -f Dockerfile"
+                    sh "docker build -t ${env.dockerImageName}:${env.dockerImageTag} ."
                 }
             
             }
