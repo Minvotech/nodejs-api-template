@@ -3,20 +3,46 @@ pipeline {
 
     environment {
         // Define environment variables for GitHub Container Registry
-        GHCR_USERNAME = credentials('eslamshehata2') // Jenkins credentials ID for GHCR username
+        GHCR_USERNAME = credentials('b6ae1537-20e2-46fd-957f-52b949237f83	') // Jenkins credentials ID for GHCR username
         GHCR_TOKEN = credentials('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') // Jenkins credentials ID for GHCR token
         IMAGE_NAME = 'ghcr.io/${{ github.repository }}/production:${{ github.sha }}'
         IMAGE_TAG = "${env.BUILD_ID}" // Tag the image with the Jenkins build ID or use a version tag
         REGISTRY_URL = 'ghcr.io'
         REPO_NAME = 'eslamshehata2/nodejs-api-template' // Replace with your GitHub username and repo name
     }
+	=======
+	
+	
+	pipeline {
+    agent any
+
+    environment {
+        GHCR_USERNAME = credentials('b6ae1537-20e2-46fd-957f-52b949237f83	') // Jenkins credentials ID for GHCR username
+        GHCR_TOKEN = credentials('b6ae1537-20e2-46fd-957f-52b949237f83	') // Jenkins credentials ID for GHCR token
+        IMAGE_NAME = 'nodejs-api-template'
+        IMAGE_TAG = "${env.BUILD_ID}" // Tag the image with the Jenkins build ID or use a version tag
+        REGISTRY_URL = 'ghcr.io'
+        REPO_NAME = 'eslamshehata2/nodejs-api-template' // Replace with your GitHub username and repo name
+    }
 
     stages {
+        stage('Setup') {
+            steps {
+                // Ensure proper permissions and directory setup
+                sh 'sudo mkdir -p /run/user/1000'
+                sh 'sudo chown -R ubuntu:ubuntu /run/user/1000'
+                sh 'ls -ltrh'
+            }
+        }
+
         stage('Checkout') {
             steps {
-                // Checkout the code from your GitHub repository
-                git 'https://github.com/Minvotech/nodejs-api-template.git'
-				branch: 'main'
+                withCredentials([usernamePassword(credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
+                    // Checkout Dockerfile from different repository and branch
+                    git credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', 
+                        url: 'https://github.com/Minvotech/nodejs-api-template.git',
+                        branch: 'main'
+                }
             }
         }
 
