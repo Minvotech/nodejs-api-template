@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define environment variables for GitHub Container Registry
+        GHCR_USERNAME = credentials('eslamshehata2') // Jenkins credentials ID for GHCR username
+        GHCR_TOKEN = credentials('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') // Jenkins credentials ID for GHCR token
+        IMAGE_NAME = 'ghcr.io/${{ github.repository }}/production:${{ github.sha }}'
+        IMAGE_TAG = "${env.BUILD_ID}" // Tag the image with the Jenkins build ID or use a version tag
+        REGISTRY_URL = 'ghcr.io'
+        REPO_NAME = 'eslamshehata2/nodejs-api-template' // Replace with your GitHub username and repo name
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from your GitHub repository
+                git 'https://github.com/Minvotech/nodejs-api-template.git'
+				branch: 'main'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image
+                    docker.build("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+                }
+            }
+        }
+
+        stage('Login to GHCR') {
+            steps {
+                script {
+                    // Login to GitHub Container Registry
+                    docker.withRegistry("https://${env.REGISTRY_URL}", "${env.GHCR_USERNAME}:${env.GHCR_TOKEN}") {
+                        // No-op - just logging in
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Tag and push the Docker image to GHCR
+                    def image = docker.image("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+                    image.push("${env.IMAGE_TAG}")
+                    image.push('latest') // Optionally, tag the image as 'latest'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up Docker images and containers if necessary
+            sh 'docker system prune -f'
+        }
+    }
+}
+
