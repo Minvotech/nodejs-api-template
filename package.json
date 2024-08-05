@@ -4,7 +4,7 @@
   "description": "Node API Template to quickly make API's with NodeJS",
   "main": "index.js",
   "scripts": {
-    "test": "mocha node_modules/**/*.js --reporter mocha-junit-reporter --timeout 60000 --exit",
+    "test": "mocha --recursive --reporter mocha-junit-reporter --timeout 60000 --exit",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
