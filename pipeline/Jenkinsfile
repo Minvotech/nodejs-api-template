@@ -71,7 +71,7 @@ pipeline{
                 //def userInput = input(id: 'userApproval', message: 'Do you REALLY want to push the images to OCIR?', parameters: [booleanParam(defaultValue: false, description: 'Confirm push', name: 'confirmPush')])
                 //def userOutput = sh(script: "oci iam user list -compartment-id ocid1.compartment.oc1..aaaaaaaa5mqkf4goflrlvbkx5vdzdgpzbmb5mtos5q5rlir5lahlliy4apma", returnStdout: true).trim()
 
-                withCredentials([usernamePassword(credentialsId: 'GITHUB_TOKEN', usernameVariable: 'eslamshehata2', passwordVariable: GITHUB_TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: 'GITHUB_TOKEN', usernameVariable: 'eslamshehata2', passwordVariable: 'GITHUB_TOKEN')]) {
 					sh " docker login --username eslamshehata2 --password ${GITHUB_TOKEN} ghcr.io"
                     sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}""
                     sh "docker push jed.ocir.io/axuh3eyjxeye/thamar-login:${env.dockerImageTag}" "docker push ghcr.io/minvotech/${env.dockerImageName}:${env.dockerImageTag}"
