@@ -31,7 +31,7 @@ pipeline{
             
                 }*/
                 sh ' mkdir -p /run/user/1000'
-                sh ' chown -R ubuntu:ubuntu /run/user/1000'
+                sh ' chown -R jenkins:jenkins /run/user/1000'
                 sh 'ls -ltrh'
 		withCredentials([usernamePassword(credentialsId: 'GITHUB_TOKEN', usernameVariable: 'GHCR_USERNAME', passwordVariable: 'GHCR_TOKEN')]) {
                 //withCredentials([usernamePassword(credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
