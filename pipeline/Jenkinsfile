@@ -73,7 +73,7 @@ pipeline{
 
                 withCredentials([usernamePassword(credentialsId: 'GITHUB_TOKEN', usernameVariable: 'eslamshehata2', passwordVariable: 'GITHUB_TOKEN')]) {
 					sh " docker login --username eslamshehata2 --password ${GITHUB_TOKEN} ghcr.io"
-                    sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}""
+                    sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
                     sh "docker push jed.ocir.io/axuh3eyjxeye/thamar-login:${env.dockerImageTag}" "docker push ghcr.io/minvotech/${env.dockerImageName}:${env.dockerImageTag}"
                }
             }
