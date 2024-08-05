@@ -8,7 +8,7 @@ pipeline{
         dockerImageName = "nodejs-api-template"
         dockerImageTag = "1.20"
         dockerOnly = 'yes'	
-	repo = 'minvotech/nodejs'
+	repo = 'ghcr.io/minvotech/nodejs'
 	GHCR_USERNAME = credentials('b6ae1537-20e2-46fd-957f-52b949237f83') // Jenkins credentials ID for GHCR username
         GHCR_TOKEN = credentials('b6ae1537-20e2-46fd-957f-52b949237f83') // Jenkins credentials ID for GHCR token
         IMAGE_NAME = 'nodejs-api-template'
@@ -58,8 +58,8 @@ pipeline{
 
                 withCredentials([usernamePassword(credentialsId: 'GITHUB_TOKEN', usernameVariable: 'eslamshehata2', passwordVariable: 'GITHUB_TOKEN')]) {
 					sh " docker login --username eslamshehata2 --password ${GITHUB_TOKEN} ghcr.io"
-                    sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
-                    sh "docker push ghcr.io/minvotech/${env.dockerImageName}:${env.dockerImageTag}"
+                    sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/${env.dockerImageName}:${env.dockerImageTag}"
+                    sh "docker push ${env.repo}/${env.dockerImageName}:${env.dockerImageTag}"
                }
             }
         }
