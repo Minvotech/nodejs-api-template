@@ -33,7 +33,8 @@ pipeline{
                 sh ' mkdir -p /run/user/1000'
                 sh ' chown -R ubuntu:ubuntu /run/user/1000'
                 sh 'ls -ltrh'
-                withCredentials([usernamePassword(credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
+		withCredentials([usernamePassword(credentialsId: 'GITHUB_TOKEN', usernameVariable: 'GHCR_USERNAME', passwordVariable: 'GHCR_TOKEN')]) {
+                //withCredentials([usernamePassword(credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
                     // Checkout Dockerfile from different repository and branch
                     git credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', 
                         url: 'https://github.com/Minvotech/nodejs-api-template.git',
@@ -44,23 +45,6 @@ pipeline{
                 }
             
             }
-        }
-        
-        stage('Nexus Upload'){
-            when {
-                expression { dockerOnly == 'no'}
-            }
-            
-            steps{
-                    sh "docker image list"
-            
-                    withCredentials([usernamePassword(credentialsId: 'sarmad-nexus-deployer', usernameVariable: 'nexusUserName', passwordVariable: 'nexusPassword')]) {
-					    sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
-                        sh " docker login -u ${env.nexusUserName} -p ${env.nexusPassword} ${env.nexusUrl}"
-                        sh " docker push ${env.nexusUrl}/${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
-                    }
-
-        }
         }
         
         
@@ -75,24 +59,24 @@ pipeline{
                 withCredentials([usernamePassword(credentialsId: 'GITHUB_TOKEN', usernameVariable: 'eslamshehata2', passwordVariable: 'GITHUB_TOKEN')]) {
 					sh " docker login --username eslamshehata2 --password ${GITHUB_TOKEN} ghcr.io"
                     sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
-                    sh "docker push jed.ocir.io/axuh3eyjxeye/thamar-login:${env.dockerImageTag}" "docker push ghcr.io/minvotech/${env.dockerImageName}:${env.dockerImageTag}"
+                    sh "docker push ghcr.io/minvotech/${env.dockerImageName}:${env.dockerImageTag}"
                }
             }
         }
         }
-        stage ('Trigger Deployment'){
-            steps{
-              script{
-                 sh "echo ${NodeImage}"
-                 sh "echo ${env.dockerImageTag}"
-                 build(job: 'Kubernetes-Deployment', parameters: [
-                        string(name: '{NodeImage', value: env.dockerImageTag),
-                    ])
+        // stage ('Trigger Deployment'){
+        //     steps{
+        //       script{
+        //          sh "echo ${NodeImage}"
+        //          sh "echo ${env.dockerImageTag}"
+        //          build(job: 'Kubernetes-Deployment', parameters: [
+        //                 string(name: '{NodeImage', value: env.dockerImageTag),
+        //             ])
               
-              }
+        //       }
             
-            }
+        //     }
         
-        }
+        // }
     }
 }
