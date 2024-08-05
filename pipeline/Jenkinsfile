@@ -21,6 +21,16 @@ pipeline{
         string(name: 'NodeImage', defaultValue: "${env.dockerImageTag}", description: 'Description of NodeImage')
     }
     stages {
+	stage('Checkout Code') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', usernameVariable: 'GHCR_USERNAME', passwordVariable: 'GHCR_TOKEN')]) {
+                    // Checkout Dockerfile from the repository
+                    git credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', 
+                        url: 'https://github.com/Minvotech/nodejs-api-template.git',
+                        branch: 'main'
+                }
+            }
+        }    
         stage('Build Image'){
             when {
                 expression { dockerOnly == 'yes'}
