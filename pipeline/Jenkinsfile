@@ -30,8 +30,8 @@ pipeline{
                 sh "docker build -t ${env.dockerImageName}:${env.dockerImageTag} -f Dockerfile"
             
                 }*/
-                sh 'sudo mkdir -p /run/user/1000'
-                sh 'sudo chown -R ubuntu:ubuntu /run/user/1000'
+                sh ' mkdir -p /run/user/1000'
+                sh ' chown -R ubuntu:ubuntu /run/user/1000'
                 sh 'ls -ltrh'
                 withCredentials([usernamePassword(credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
                     // Checkout Dockerfile from different repository and branch
@@ -52,12 +52,12 @@ pipeline{
             }
             
             steps{
-                    sh "sudo -u ubuntu docker image list"
+                    sh "docker image list"
             
                     withCredentials([usernamePassword(credentialsId: 'sarmad-nexus-deployer', usernameVariable: 'nexusUserName', passwordVariable: 'nexusPassword')]) {
-					    sh "sudo -u ubuntu docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
-                        sh "sudo -u ubuntu docker login -u ${env.nexusUserName} -p ${env.nexusPassword} ${env.nexusUrl}"
-                        sh "sudo -u ubuntu docker push ${env.nexusUrl}/${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
+					    sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
+                        sh " docker login -u ${env.nexusUserName} -p ${env.nexusPassword} ${env.nexusUrl}"
+                        sh " docker push ${env.nexusUrl}/${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
                     }
 
         }
