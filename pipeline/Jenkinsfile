@@ -1,7 +1,8 @@
 pipeline{
-    agent {
-        label 'docker-builder'
-    }
+    agent any	
+//    agent {
+ //        'any' //'docker-builder'
+  //  }
     
     environment{
         dockerImageName = "nodejs-api-template"
