@@ -1,8 +1,5 @@
 pipeline{
     agent any	
-    tools {
-        nodejs 'NodeJS'
-    }
 //    agent {
  //        'any' //'docker-builder'
   //  }
@@ -33,7 +30,12 @@ pipeline{
                         branch: 'main'
                 }
             }
-        }    
+        }
+	stage('Install Dependencies') {
+            steps {
+                sh 'npm install' // Replace with your package manager command
+            }
+            
         stage('Build Image'){
             when {
                 expression { dockerOnly == 'yes'}
@@ -64,12 +66,13 @@ pipeline{
 	stage('Run Unit Tests') {
             steps {
                 script {
-                    echo "Running unit tests..."
-                    sh 'npm install'
-                    sh 'npm run test'
+                    sh 'npm test' // Replace with your test runner command
                 }
             }
-        }   
+            postCondition {
+                outcome = returnStatus() == 0 // Check for failed tests
+            }
+        } 
         
         
         stage ('GHCR Upload'){
