@@ -1,72 +1,99 @@
-pipeline {
-    agent any
+@Library('sarmad-shared-library') _
 
-    environment {
-        GHCR_USERNAME = credentials('b6ae1537-20e2-46fd-957f-52b949237f83	') // Jenkins credentials ID for GHCR username
-        GHCR_TOKEN = credentials('b6ae1537-20e2-46fd-957f-52b949237f83	') // Jenkins credentials ID for GHCR token
+pipeline{
+    agent {
+        label 'docker-builder'
+    }
+    
+    environment{
+        dockerImageName = "nodejs-api-template"
+        dockerImageTag = "1.20"
+        dockerOnly = 'yes'	
+		repo= 'minvotech/nodejs'
+		GHCR_USERNAME = credentials('b6ae1537-20e2-46fd-957f-52b949237f83') // Jenkins credentials ID for GHCR username
+        GHCR_TOKEN = credentials('b6ae1537-20e2-46fd-957f-52b949237f83') // Jenkins credentials ID for GHCR token
         IMAGE_NAME = 'nodejs-api-template'
         IMAGE_TAG = "${env.BUILD_ID}" // Tag the image with the Jenkins build ID or use a version tag
         REGISTRY_URL = 'ghcr.io'
         REPO_NAME = 'eslamshehata2/nodejs-api-template' // Replace with your GitHub username and repo name
     }
-
+    parameters {
+        string(name: 'LoginImage', defaultValue: "${env.dockerImageTag}", description: 'Description of LoginImage')
+    }
     stages {
-        stage('Setup') {
-            steps {
-                // Ensure proper permissions and directory setup
+        stage('Build Image'){
+            when {
+                expression { dockerOnly == 'yes'}
+            }
+            steps{
+             /*dir('pipelines/Web-FrontEnd/'){
+                sh "ls -ltrh"
+                sh "docker build -t ${env.dockerImageName}:${env.dockerImageTag} -f Dockerfile"
+            
+                }*/
                 sh 'sudo mkdir -p /run/user/1000'
                 sh 'sudo chown -R ubuntu:ubuntu /run/user/1000'
                 sh 'ls -ltrh'
-            }
-        }
-
-        stage('Checkout') {
-            steps {
                 withCredentials([usernamePassword(credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
                     // Checkout Dockerfile from different repository and branch
                     git credentialsId: 'b6ae1537-20e2-46fd-957f-52b949237f83', 
-                        url: 'https://github.com/Minvotech/nodejs-api-template.git',
-                        branch: 'main'
+                        url: 'https://github.com/Minvotech/nodejs-api-template.git'',
+                        branch: 'main' 
+                    sh "ls -ltrh"
+                    sh 'pwd'
+                    sh "docker build -t ${env.dockerImageName}:${env.dockerImageTag} -f Dockerfile"
                 }
+            
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    // Build the Docker image
-                    docker.build("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
-                }
+        
+        stage('Nexus Upload'){
+            when {
+                expression { dockerOnly == 'no'}
             }
-        }
-
-        stage('Login to GHCR') {
-            steps {
-                script {
-                    // Login to GitHub Container Registry
-                    docker.withRegistry("https://${env.REGISTRY_URL}", "${env.GHCR_USERNAME}:${env.GHCR_TOKEN}") {
-                        // No-op - just logging in
+            
+            steps{
+                    sh "sudo -u ubuntu docker image list"
+            
+                    withCredentials([usernamePassword(credentialsId: 'sarmad-nexus-deployer', usernameVariable: 'nexusUserName', passwordVariable: 'nexusPassword')]) {
+					    sh "sudo -u ubuntu docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
+                        sh "sudo -u ubuntu docker login -u ${env.nexusUserName} -p ${env.nexusPassword} ${env.nexusUrl}"
+                        sh "sudo -u ubuntu docker push ${env.nexusUrl}/${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}"
                     }
-                }
-            }
-        }
 
-        stage('Push Docker Image') {
+        }
+        }
+        
+        
+        stage ('GHCR Upload'){
             steps {
-                script {
-                    // Tag and push the Docker image to GHCR
-                    def image = docker.image("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
-                    image.push("${env.IMAGE_TAG}")
-                    image.push('latest') // Optionally, tag the image as 'latest'
-                }
+              script {
+                sh "docker image list"
+                //approval.requestInputApproval "1", "HOURS", "Do you REALLY want to push the images to OCIR?", "Please confirm.", " Please confirm."
+                //def userInput = input(id: 'userApproval', message: 'Do you REALLY want to push the images to OCIR?', parameters: [booleanParam(defaultValue: false, description: 'Confirm push', name: 'confirmPush')])
+                //def userOutput = sh(script: "oci iam user list -compartment-id ocid1.compartment.oc1..aaaaaaaa5mqkf4goflrlvbkx5vdzdgpzbmb5mtos5q5rlir5lahlliy4apma", returnStdout: true).trim()
+
+                withCredentials([usernamePassword(credentialsId: 'GITHUB_TOKEN', usernameVariable: 'eslamshehata2', passwordVariable: GITHUB_TOKEN')]) {
+					sh " docker login --username eslamshehata2 --password ${GITHUB_TOKEN} ghcr.io"
+                    sh "docker tag ${env.dockerImageName}:${env.dockerImageTag}  ${env.repo}/nodejs/${env.dockerImageName}:${env.dockerImageTag}""
+                    sh "docker push jed.ocir.io/axuh3eyjxeye/thamar-login:${env.dockerImageTag}" "docker push ghcr.io/minvotech/${env.dockerImageName}:${env.dockerImageTag}"
+               }
             }
         }
-    }
-
-    post {
-        always {
-            // Clean up Docker images and containers if necessary
-            sh 'docker system prune -f'
+        }
+        stage ('Trigger Deployment'){
+            steps{
+              script{
+                 sh "echo ${NodeImage}"
+                 sh "echo ${env.dockerImageTag}"
+                 build(job: 'Kubernetes-Deployment', parameters: [
+                        string(name: '{NodeImage', value: env.dockerImageTag),
+                    ])
+              
+              }
+            
+            }
+        
         }
     }
 }
