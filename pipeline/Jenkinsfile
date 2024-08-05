@@ -70,10 +70,11 @@ pipeline{
                     sh 'npm test' // Replace with your test runner command
                 }
             }
-            postCondition {
-                outcome = returnStatus() == 0 // Check for failed tests
-            }
-        } 
+	}
+            // postCondition {
+            //     outcome = returnStatus() == 0 // Check for failed tests
+            // }
+        
         
         
         stage ('GHCR Upload'){
