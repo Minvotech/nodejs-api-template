@@ -17,7 +17,7 @@ pipeline{
         REPO_NAME = 'eslamshehata2/nodejs-api-template' // Replace with your GitHub username and repo name
     }
     parameters {
-        string(name: 'LoginImage', defaultValue: "${env.dockerImageTag}", description: 'Description of LoginImage')
+        string(name: 'NodeImage', defaultValue: "${env.dockerImageTag}", description: 'Description of NodeImage')
     }
     stages {
         stage('Build Image'){
